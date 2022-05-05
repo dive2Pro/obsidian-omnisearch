@@ -14,20 +14,14 @@ import {
   wait,
 } from './utils'
 import type { Query } from './query'
+import init, { add_word, cut as jiebaCut, tokenize as t } from "jieba-wasm";
 
 let minisearchInstance: MiniSearch<IndexedNote>
 let indexedNotes: Record<string, IndexedNote> = {}
 
 const tokenize = (text: string): string[] => {
-  const tokens = text.split(SPACE_OR_PUNCTUATION)
-  const chsSegmenter = (app as any).plugins.plugins['cm-chs-patch']
-
-  if (chsSegmenter) {
-    return tokens.flatMap(word =>
-      chsRegex.test(word) ? chsSegmenter.cut(word) : [word],
-    )
-  }
-  else return tokens
+   const tokens = t(text, "default", true)
+   return tokens.flatMap(token => token.word)
 }
 
 /**
